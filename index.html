@@ -2,216 +2,583 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Menu Paramètres Exemple</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Jeu de Plateforme Mobile Friendly</title>
 <style>
-  /* Styles pour le bouton engrenage */
-  #btnSettings {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 28px;
-    color: #333;
-    transition: color 0.3s;
-    z-index: 1100;
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: linear-gradient(to bottom, #87ceeb, #444);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+    user-select: none;
   }
-  #btnSettings:hover {
-    color: #007bff;
+  #gameContainer {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
   }
-
-  /* Overlay modal */
-  #modalBg {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(0, 0, 128, 0.5);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1200;
-  }
-
-  /* Contenu modal */
-  #modal {
-    background: white;
-    padding: 25px 30px;
-    border-radius: 12px;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 0 18px rgba(0,0,0,0.3);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #222;
-    text-align: left;
-  }
-
-  #modal h2 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-weight: 700;
-    color: #004080;
-  }
-
-  label {
+  canvas {
+    background: linear-gradient(to bottom, #87ceeb, #444);
     display: block;
-    margin: 12px 0 6px;
-    font-weight: 600;
+    margin: 0 auto;
+    border: 5px solid white;
+    box-shadow: 0 0 15px black;
+    touch-action: none;
   }
-
-  input[type="text"], select {
-    width: 100%;
-    padding: 8px 10px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: 1.5px solid #ccc;
-    box-sizing: border-box;
-    transition: border-color 0.3s;
+  #hud {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 20px;
+    text-shadow: 1px 1px 3px black;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 15px;
+    border-radius: 10px;
+    z-index: 10;
+    width: 300px;
+    text-align: center;
   }
-  input[type="text"]:focus, select:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-
-  .btnRow {
-    margin-top: 25px;
-    text-align: right;
+  #menu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 28px;
+    background: rgba(0,0,0,0.8);
+    padding: 25px 40px;
+    border-radius: 15px;
+    text-align: center;
+    z-index: 20;
+    max-width: 90vw;
   }
   button {
-    cursor: pointer;
-    background-color: #007bff;
-    color: white;
+    margin-top: 20px;
+    font-size: 20px;
+    padding: 10px 25px;
     border: none;
-    font-weight: 700;
-    padding: 10px 18px;
-    margin-left: 10px;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: background-color 0.3s;
+    border-radius: 10px;
+    background: gold;
+    cursor: pointer;
+    transition: background 0.3s ease;
   }
   button:hover {
-    background-color: #0056b3;
+    background: orange;
   }
-  button#cancelBtn {
-    background-color: #aaa;
+
+  /* Contrôles tactiles */
+  #touchControls {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    max-width: 600px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 15;
+    user-select: none;
   }
-  button#cancelBtn:hover {
-    background-color: #888;
+  .btn {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    color: white;
+    font-size: 24px;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+    user-select: none;
+    touch-action: none;
+    box-shadow: 0 0 10px #0006;
+    transition: background 0.2s ease;
+  }
+  .btn:active {
+    background: rgba(255,255,255,0.5);
+  }
+  #btnLeft, #btnRight {
+    width: 70px;
+  }
+  #btnJump {
+    width: 80px;
+    font-weight: bold;
+  }
+  #btnPause {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.3);
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+    line-height: 50px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #0006;
+    z-index: 20;
+  }
+  #btnPause:active {
+    background: rgba(255,255,255,0.6);
   }
 </style>
 </head>
 <body>
 
-<!-- Bouton engrenage -->
-<button id="btnSettings" title="Paramètres ⚙️">⚙️</button>
+<div id="gameContainer">
+  <canvas id="gameCanvas" width="800" height="450"></canvas>
+  <div id="hud">Score: <span id="score">0</span> | Vies: <span id="lives">3</span> | Niveau: <span id="level">1</span></div>
+  <div id="menu">
+    <div id="menuMessage">Jeu de Plateforme</div>
+    <button id="startBtn">Démarrer</button>
+  </div>
 
-<!-- Modal -->
-<div id="modalBg">
-  <div id="modal"></div>
+  <div id="touchControls" style="display:none;">
+    <div id="btnLeft" class="btn">◀</div>
+    <div id="btnJump" class="btn">↑</div>
+    <div id="btnRight" class="btn">▶</div>
+  </div>
+  <div id="btnPause" title="Pause" style="display:none;">❚❚</div>
 </div>
 
+<!-- Sons libres de droits -->
+<audio id="jumpSound" src="https://freesound.org/data/previews/331/331912_3248244-lq.mp3"></audio>
+<audio id="coinSound" src="https://freesound.org/data/previews/341/341695_3248244-lq.mp3"></audio>
+<audio id="hitSound" src="https://freesound.org/data/previews/198/198841_285997-lq.mp3"></audio>
+<audio id="bgMusic" src="https://freesound.org/data/previews/415/415209_5121236-lq.mp3" loop></audio>
+
 <script>
-  // Références DOM
-  const btnSettings = document.getElementById('btnSettings');
-  const modalBg = document.getElementById('modalBg');
-  const modal = document.getElementById('modal');
+(() => {
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  const scoreEl = document.getElementById("score");
+  const livesEl = document.getElementById("lives");
+  const levelEl = document.getElementById("level");
+  const menu = document.getElementById("menu");
+  const menuMessage = document.getElementById("menuMessage");
+  const startBtn = document.getElementById("startBtn");
 
-  // Variables pour les contrôles (exemple)
-  let controls = {
-    left: 'A',
-    right: 'D',
-    jump: 'W'
+  const touchControls = document.getElementById("touchControls");
+  const btnLeft = document.getElementById("btnLeft");
+  const btnRight = document.getElementById("btnRight");
+  const btnJump = document.getElementById("btnJump");
+  const btnPause = document.getElementById("btnPause");
+
+  const jumpSound = document.getElementById("jumpSound");
+  const coinSound = document.getElementById("coinSound");
+  const hitSound = document.getElementById("hitSound");
+  const bgMusic = document.getElementById("bgMusic");
+  bgMusic.volume = 0.3;
+
+  const gravity = 0.8;
+  const friction = 0.8;
+  const keys = {};
+
+  let score = 0;
+  let lives = 3;
+  let level = 1;
+  let gameOver = false;
+  let win = false;
+  let gameStarted = false;
+  let paused = false;
+
+  const player = {
+    x: 50,
+    y: 300,
+    width: 40,
+    height: 40,
+    color: "gold",
+    velX: 0,
+    velY: 0,
+    speed: 4,
+    jumping: false,
+    grounded: false,
+    doubleJump: false
   };
 
-  // Variable langue (exemple)
-  let language = 'fr';
+  let platforms = [];
+  let coins = [];
+  let enemies = [];
 
-  // Skins disponibles et sélection
-  const skins = {
-    default: 'Stickman',
-    ninja: 'Ninja',
-    robot: 'Robot'
-  };
-  let currentSkin = 'default';
+  function colCheck(shapeA, shapeB) {
+    const vX = (shapeA.x + shapeA.width / 2) - (shapeB.x + shapeB.width / 2);
+    const vY = (shapeA.y + shapeA.height / 2) - (shapeB.y + shapeB.height / 2);
+    const hWidths = (shapeA.width / 2) + (shapeB.width / 2);
+    const hHeights = (shapeA.height / 2) + (shapeB.height / 2);
+    let colDir = null;
 
-  // Ouvre le menu paramètres
-  function openSettings(){
-    modalBg.style.display = 'flex';
-    modal.innerHTML = `
-      <h2>Paramètres</h2>
-
-      <label for="leftKey">Touche Gauche :</label>
-      <input type="text" id="leftKey" maxlength="1" value="${controls.left}" />
-
-      <label for="rightKey">Touche Droite :</label>
-      <input type="text" id="rightKey" maxlength="1" value="${controls.right}" />
-
-      <label for="jumpKey">Touche Saut :</label>
-      <input type="text" id="jumpKey" maxlength="1" value="${controls.jump}" />
-
-      <label for="langSelect">Langue :</label>
-      <select id="langSelect">
-        <option value="fr" ${language==='fr' ? 'selected' : ''}>Français</option>
-        <option value="en" ${language==='en' ? 'selected' : ''}>English</option>
-        <option value="de" ${language==='de' ? 'selected' : ''}>Deutsch</option>
-        <option value="es" ${language==='es' ? 'selected' : ''}>Español</option>
-      </select>
-
-      <label for="skinSelect">Skin :</label>
-      <select id="skinSelect">
-        ${Object.entries(skins).map(([key, name]) => `
-          <option value="${key}" ${currentSkin === key ? 'selected' : ''}>${name}</option>
-        `).join('')}
-      </select>
-
-      <div class="btnRow">
-        <button id="saveBtn">Sauvegarder</button>
-        <button id="cancelBtn">Annuler</button>
-      </div>
-    `;
-
-    // Gestion boutons
-    document.getElementById('cancelBtn').onclick = () => {
-      modalBg.style.display = 'none';
-    };
-
-    document.getElementById('saveBtn').onclick = () => {
-      // Sauvegarder les valeurs (avec validation simple)
-      const leftInput = document.getElementById('leftKey').value.toUpperCase() || controls.left;
-      const rightInput = document.getElementById('rightKey').value.toUpperCase() || controls.right;
-      const jumpInput = document.getElementById('jumpKey').value.toUpperCase() || controls.jump;
-
-      if(!leftInput.match(/^[A-Z]$/) || !rightInput.match(/^[A-Z]$/) || !jumpInput.match(/^[A-Z]$/)){
-        alert('Les touches doivent être une seule lettre de A à Z.');
-        return;
+    if (Math.abs(vX) < hWidths && Math.abs(vY) < hHeights) {
+      const oX = hWidths - Math.abs(vX);
+      const oY = hHeights - Math.abs(vY);
+      if (oX >= oY) {
+        if (vY > 0) {
+          colDir = "t";
+          shapeA.y += oY;
+        } else {
+          colDir = "b";
+          shapeA.y -= oY;
+        }
+      } else {
+        if (vX > 0) {
+          colDir = "l";
+          shapeA.x += oX;
+        } else {
+          colDir = "r";
+          shapeA.x -= oX;
+        }
       }
-
-      controls.left = leftInput;
-      controls.right = rightInput;
-      controls.jump = jumpInput;
-
-      language = document.getElementById('langSelect').value;
-      currentSkin = document.getElementById('skinSelect').value;
-
-      alert('Paramètres sauvegardés !');
-
-      modalBg.style.display = 'none';
-
-      // Ici tu peux ajouter le code pour appliquer les paramètres au jeu (ex: changer touches, langue, skin)
-      console.log('Contrôles:', controls);
-      console.log('Langue:', language);
-      console.log('Skin:', currentSkin);
-    };
+    }
+    return colDir;
   }
 
-  btnSettings.addEventListener('click', openSettings);
+  function generateLevel(lvl) {
+    platforms = [
+      { x: 0, y: 410, width: 800, height: 40 },
+      { x: 200, y: 350, width: 100, height: 20 },
+      { x: 400, y: 300, width: 100, height: 20 },
+      { x: 600, y: 250, width: 100, height: 20 },
+    ];
 
-  // Fermer modal si clic en dehors du contenu
-  modalBg.addEventListener('click', e => {
-    if(e.target === modalBg){
-      modalBg.style.display = 'none';
+    coins = [
+      { x: 210, y: 320, collected: false },
+      { x: 410, y: 270, collected: false },
+      { x: 610, y: 220, collected: false },
+    ];
+
+    enemies = [
+      { x: 300, y: 370, width: 40, height: 40, color: "red", dir: 1, speed: 2 },
+    ];
+
+    if (lvl >= 2) {
+      platforms.push({ x: 100, y: 200, width: 100, height: 20 });
+      coins.push({ x: 110, y: 170, collected: false });
+      enemies.push({ x: 500, y: 270, width: 40, height: 40, color: "purple", dir: -1, speed: 2 });
+    }
+
+    if (lvl >= 3) {
+      platforms.push({ x: 700, y: 180, width: 80, height: 20 });
+      coins.push({ x: 710, y: 150, collected: false });
+      enemies.push({ x: 650, y: 220, width: 40, height: 40, color: "blue", dir: 1, speed: 3 });
+    }
+
+    if (lvl >= 4) {
+      platforms.push({ x: 500, y: 150, width: 120, height: 20 });
+      coins.push({ x: 510, y: 120, collected: false });
+      enemies.push({ x: 200, y: 310, width: 40, height: 40, color: "orange", dir: 1, speed: 4 });
+    }
+
+    if (lvl >= 5) {
+      platforms.push({ x: 350, y: 100, width: 150, height: 20 });
+      coins.push({ x: 360, y: 70, collected: false });
+      enemies.push({ x: 550, y: 210, width: 40, height: 40, color: "cyan", dir: -1, speed: 3 });
+    }
+
+    levelEl.textContent = lvl;
+  }
+
+  function nextLevel() {
+    level++;
+    generateLevel(level);
+    player.x = 50;
+    player.y = 300;
+  }
+
+  function resetGame() {
+    score = 0;
+    lives = 3;
+    level = 1;
+    gameOver = false;
+    win = false;
+    player.x = 50;
+    player.y = 300;
+    scoreEl.textContent = score;
+    livesEl.textContent = lives;
+    levelEl.textContent = level;
+  }
+
+  function startGame() {
+    resetGame();
+    menu.style.display = "none";
+    touchControls.style.display = "flex";
+    btnPause.style.display = "block";
+    bgMusic.play();
+    gameStarted = true;
+    generateLevel(level);
+    requestAnimationFrame(gameLoop);
+  }
+
+  function togglePause() {
+    paused = !paused;
+    if (paused) {
+      menuMessage.innerHTML = "Pause<br>Appuyez sur Reprendre";
+      startBtn.textContent = "Reprendre";
+      menu.style.display = "block";
+      bgMusic.pause();
+    } else {
+      menu.style.display = "none";
+      bgMusic.play();
+      requestAnimationFrame(gameLoop);
+    }
+  }
+
+  function gameLoop() {
+    if (!gameStarted || paused) return;
+
+    if (gameOver) {
+      menuMessage.innerHTML = `Game Over !<br>Score : ${score}<br>Meilleur : ${localStorage.getItem('bestScore') || 0}`;
+      menu.style.display = "block";
+      bgMusic.pause();
+      saveBestScore();
+      return;
+    }
+
+    if (win) {
+      menuMessage.innerHTML = `Bravo, tu as gagné !<br>Score : ${score}<br>Meilleur : ${localStorage.getItem('bestScore') || 0}`;
+      menu.style.display = "block";
+      bgMusic.pause();
+      saveBestScore();
+      return;
+    }
+
+    // Gestion input clavier + tactile
+    if ((keys["ArrowRight"] || keys["d"] || keys["btnRight"]) && player.velX < player.speed) player.velX++;
+    if ((keys["ArrowLeft"] || keys["a"] || keys["btnLeft"]) && player.velX > -player.speed) player.velX--;
+    if (!(keys["ArrowLeft"] || keys["a"] || keys["btnLeft"]) && !(keys["ArrowRight"] || keys["d"] || keys["btnRight"])) {
+      player.velX *= friction;
+    }
+
+    // Saut
+    if ((keys["ArrowUp"] || keys["w"] || keys["z"] || keys["btnJump"]) && !player.jumping) {
+      player.jumping = true;
+      player.grounded = false;
+      player.velY = -15;
+      jumpSound.currentTime = 0;
+      jumpSound.play();
+    } else if ((keys["ArrowUp"] || keys["w"] || keys["z"] || keys["btnJump"]) && player.jumping && !player.doubleJump) {
+      // double saut
+      player.velY = -13;
+      player.doubleJump = true;
+      jumpSound.currentTime = 0;
+      jumpSound.play();
+    }
+
+    player.velY += gravity;
+
+    // Limiter vitesse horizontale
+    if (player.velX > player.speed) player.velX = player.speed;
+    if (player.velX < -player.speed) player.velX = -player.speed;
+
+    player.x += player.velX;
+    player.y += player.velY;
+
+    player.grounded = false;
+    player.doubleJump = false;
+
+    // Collisions plateformes
+    for (let p of platforms) {
+      const dir = colCheck(player, p);
+      if (dir === "b") {
+        player.grounded = true;
+        player.jumping = false;
+        player.velY = 0;
+      } else if (dir === "l" || dir === "r") {
+        player.velX = 0;
+      }
+    }
+
+    if (player.grounded) {
+      player.velX *= friction;
+    }
+
+    // Collecte pièces
+    for (let c of coins) {
+      if (!c.collected) {
+        if (
+          player.x < c.x + 20 &&
+          player.x + player.width > c.x &&
+          player.y < c.y + 20 &&
+          player.y + player.height > c.y
+        ) {
+          c.collected = true;
+          score += 10;
+          coinSound.currentTime = 0;
+          coinSound.play();
+          scoreEl.textContent = score;
+        }
+      }
+    }
+
+    // Déplacement ennemis
+    for (let e of enemies) {
+      e.x += e.dir * e.speed;
+      // Changer direction si collision avec bord plateforme
+      let onPlatform = false;
+      for (let p of platforms) {
+        if (
+          e.x + e.width > p.x &&
+          e.x < p.x + p.width &&
+          e.y + e.height === p.y
+        ) {
+          onPlatform = true;
+          if (e.x <= p.x || e.x + e.width >= p.x + p.width) e.dir *= -1;
+        }
+      }
+      if (!onPlatform) e.dir *= -1;
+
+      // Collision joueur-ennemis
+      if (
+        player.x < e.x + e.width &&
+        player.x + player.width > e.x &&
+        player.y < e.y + e.height &&
+        player.y + player.height > e.y
+      ) {
+        lives--;
+        hitSound.currentTime = 0;
+        hitSound.play();
+        livesEl.textContent = lives;
+        if (lives <= 0) gameOver = true;
+        player.x = 50;
+        player.y = 300;
+      }
+    }
+
+    // Vérif tous pièces collectées ?
+    if (coins.every(c => c.collected)) {
+      nextLevel();
+    }
+
+    // Limites du canvas
+    if (player.x < 0) player.x = 0;
+    if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+    if (player.y > canvas.height) {
+      lives--;
+      hitSound.currentTime = 0;
+      hitSound.play();
+      livesEl.textContent = lives;
+      if (lives <= 0) gameOver = true;
+      player.x = 50;
+      player.y = 300;
+      player.velY = 0;
+    }
+
+    // Effacer et dessiner
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Dessiner plateformes
+    ctx.fillStyle = "#654321";
+    for (let p of platforms) {
+      ctx.fillRect(p.x, p.y, p.width, p.height);
+    }
+
+    // Dessiner pièces
+    for (let c of coins) {
+      if (!c.collected) {
+        ctx.fillStyle = "yellow";
+        ctx.beginPath();
+        ctx.arc(c.x + 10, c.y + 10, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "orange";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    }
+
+    // Dessiner ennemis
+    for (let e of enemies) {
+      ctx.fillStyle = e.color;
+      ctx.fillRect(e.x, e.y, e.width, e.height);
+    }
+
+    // Dessiner joueur
+    ctx.fillStyle = player.color;
+    ctx.fillRect(player.x, player.y, player.width, player.height);
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  // Gestion clavier
+  window.addEventListener("keydown", (e) => {
+    if (e.repeat) return;
+    keys[e.key.toLowerCase()] = true;
+    // Pour les touches tactiles simulées
+    if (e.key === "ArrowLeft") keys["btnLeft"] = true;
+    if (e.key === "ArrowRight") keys["btnRight"] = true;
+    if (e.key === "ArrowUp") keys["btnJump"] = true;
+  });
+
+  window.addEventListener("keyup", (e) => {
+    keys[e.key.toLowerCase()] = false;
+    if (e.key === "ArrowLeft") keys["btnLeft"] = false;
+    if (e.key === "ArrowRight") keys["btnRight"] = false;
+    if (e.key === "ArrowUp") keys["btnJump"] = false;
+  });
+
+  // Gestion boutons tactiles
+  btnLeft.addEventListener("touchstart", e => {
+    e.preventDefault();
+    keys["btnLeft"] = true;
+  });
+  btnLeft.addEventListener("touchend", e => {
+    e.preventDefault();
+    keys["btnLeft"] = false;
+  });
+  btnRight.addEventListener("touchstart", e => {
+    e.preventDefault();
+    keys["btnRight"] = true;
+  });
+  btnRight.addEventListener("touchend", e => {
+    e.preventDefault();
+    keys["btnRight"] = false;
+  });
+  btnJump.addEventListener("touchstart", e => {
+    e.preventDefault();
+    keys["btnJump"] = true;
+  });
+  btnJump.addEventListener("touchend", e => {
+    e.preventDefault();
+    keys["btnJump"] = false;
+  });
+
+  btnPause.addEventListener("click", () => {
+    togglePause();
+  });
+
+  // Adapt canvas taille écran (responsive)
+  function resizeCanvas() {
+    const ratio = 16/9;
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    if (w/h > ratio) {
+      w = h * ratio;
+    } else {
+      h = w / ratio;
+    }
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  startBtn.addEventListener("click", () => {
+    if (!gameStarted) {
+      startGame();
+    } else {
+      location.reload();
     }
   });
+
+  // Instructions clavier dans menu
+  menuMessage.innerHTML +=
+    "<br><small>Déplacements : flèches / ZQSD ou boutons tactiles<br>Saut : flèche haut / Z / W (double saut ok)<br>Collecte toutes les pièces pour passer niveau</small>";
+
+  function saveBestScore() {
+    const best = localStorage.getItem('bestScore') || 0;
+    if (score > best) localStorage.setItem('bestScore', score);
+  }
+})();
 </script>
 
 </body>
