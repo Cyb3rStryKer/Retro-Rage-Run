@@ -2,452 +2,208 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Jeu de Plateforme Mobile Friendly</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Retro rage run</title>
 <style>
-  html, body {
-    margin: 0; padding: 0;
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body, html {
     height: 100%;
-    background: linear-gradient(to bottom, #87ceeb, #444);
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    -webkit-tap-highlight-color: transparent;
-    overflow: hidden;
-    user-select: none;
-  }
-  #gameContainer {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
+    background: linear-gradient(to bottom, #87ceeb, #3b5998);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow: hidden;
   }
-  canvas {
-    background: linear-gradient(to bottom, #87ceeb, #444);
+  #gameCanvas {
     display: block;
-    margin: 0 auto;
-    border: 5px solid white;
-    box-shadow: 0 0 15px black;
+    margin: auto;
+    background: #87ceeb;
     touch-action: none;
+    border: 3px solid #333;
+    border-radius: 10px;
   }
-  #hud {
-    position: absolute;
+  #ui {
+    position: fixed;
     top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: white;
-    font-size: 20px;
-    text-shadow: 1px 1px 3px black;
-    background: rgba(0,0,0,0.4);
-    padding: 6px 15px;
-    border-radius: 10px;
+    left: 10px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+    text-shadow: 1px 1px 3px #000;
+    user-select: none;
     z-index: 10;
-    width: 300px;
-    text-align: center;
   }
-  #menu {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 28px;
-    background: rgba(0,0,0,0.8);
-    padding: 25px 40px;
-    border-radius: 15px;
-    text-align: center;
-    z-index: 20;
-    max-width: 90vw;
-  }
-  button {
-    margin-top: 20px;
-    font-size: 20px;
-    padding: 10px 25px;
-    border: none;
-    border-radius: 10px;
-    background: gold;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  button:hover {
-    background: orange;
-  }
-
-  /* Contrôles tactiles */
-  #touchControls {
-    position: absolute;
+  /* Boutons tactiles pour mobile */
+  #controls {
+    position: fixed;
     bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
-    width: 90vw;
-    max-width: 600px;
+    width: 90%;
+    max-width: 400px;
     display: flex;
     justify-content: space-between;
-    z-index: 15;
-    user-select: none;
+    z-index: 10;
   }
-  .btn {
-    background: rgba(255,255,255,0.2);
+  button.control-btn {
+    background: rgba(0,0,0,0.4);
+    border: none;
     border-radius: 10px;
     color: white;
     font-size: 24px;
-    width: 60px;
-    height: 60px;
-    text-align: center;
-    line-height: 60px;
+    padding: 20px 25px;
     user-select: none;
-    touch-action: none;
-    box-shadow: 0 0 10px #0006;
-    transition: background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   }
-  .btn:active {
-    background: rgba(255,255,255,0.5);
-  }
-  #btnLeft, #btnRight {
-    width: 70px;
-  }
-  #btnJump {
-    width: 80px;
-    font-weight: bold;
-  }
-  #btnPause {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(255,255,255,0.3);
-    width: 50px;
-    height: 50px;
-    font-size: 28px;
-    line-height: 50px;
-    border-radius: 50%;
-    box-shadow: 0 0 10px #0006;
-    z-index: 20;
-  }
-  #btnPause:active {
-    background: rgba(255,255,255,0.6);
+  button.control-btn:active {
+    background: rgba(0,0,0,0.7);
   }
 </style>
 </head>
 <body>
 
-<div id="gameContainer">
-  <canvas id="gameCanvas" width="800" height="450"></canvas>
-  <div id="hud">Score: <span id="score">0</span> | Vies: <span id="lives">3</span> | Niveau: <span id="level">1</span></div>
-  <div id="menu">
-    <div id="menuMessage">Jeu de Plateforme</div>
-    <button id="startBtn">Démarrer</button>
-  </div>
-
-  <div id="touchControls" style="display:none;">
-    <div id="btnLeft" class="btn">◀</div>
-    <div id="btnJump" class="btn">↑</div>
-    <div id="btnRight" class="btn">▶</div>
-  </div>
-  <div id="btnPause" title="Pause" style="display:none;">❚❚</div>
+<canvas id="gameCanvas" width="480" height="270"></canvas>
+<div id="ui">
+  Vies: <span id="lives">3</span> | Score: <span id="score">0</span>
 </div>
-
-<!-- Sons libres de droits -->
-<audio id="jumpSound" src="https://freesound.org/data/previews/331/331912_3248244-lq.mp3"></audio>
-<audio id="coinSound" src="https://freesound.org/data/previews/341/341695_3248244-lq.mp3"></audio>
-<audio id="hitSound" src="https://freesound.org/data/previews/198/198841_285997-lq.mp3"></audio>
-<audio id="bgMusic" src="https://freesound.org/data/previews/415/415209_5121236-lq.mp3" loop></audio>
+<div id="controls">
+  <button id="leftBtn" class="control-btn">⬅️</button>
+  <button id="jumpBtn" class="control-btn">⬆️</button>
+  <button id="rightBtn" class="control-btn">➡️</button>
+</div>
 
 <script>
 (() => {
-  const canvas = document.getElementById("gameCanvas");
-  const ctx = canvas.getContext("2d");
-  const scoreEl = document.getElementById("score");
-  const livesEl = document.getElementById("lives");
-  const levelEl = document.getElementById("level");
-  const menu = document.getElementById("menu");
-  const menuMessage = document.getElementById("menuMessage");
-  const startBtn = document.getElementById("startBtn");
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const livesDisplay = document.getElementById('lives');
+  const scoreDisplay = document.getElementById('score');
+  const leftBtn = document.getElementById('leftBtn');
+  const rightBtn = document.getElementById('rightBtn');
+  const jumpBtn = document.getElementById('jumpBtn');
 
-  const touchControls = document.getElementById("touchControls");
-  const btnLeft = document.getElementById("btnLeft");
-  const btnRight = document.getElementById("btnRight");
-  const btnJump = document.getElementById("btnJump");
-  const btnPause = document.getElementById("btnPause");
-
-  const jumpSound = document.getElementById("jumpSound");
-  const coinSound = document.getElementById("coinSound");
-  const hitSound = document.getElementById("hitSound");
-  const bgMusic = document.getElementById("bgMusic");
-  bgMusic.volume = 0.3;
-
-  const gravity = 0.8;
+  const gravity = 0.7;
   const friction = 0.8;
-  const keys = {};
-
-  let score = 0;
-  let lives = 3;
-  let level = 1;
-  let gameOver = false;
-  let win = false;
-  let gameStarted = false;
-  let paused = false;
 
   const player = {
     x: 50,
-    y: 300,
-    width: 40,
-    height: 40,
-    color: "gold",
+    y: 0,
+    width: 30,
+    height: 50,
+    color: '#ff5722',
     velX: 0,
     velY: 0,
     speed: 4,
     jumping: false,
     grounded: false,
-    doubleJump: false
+    doubleJump: false,
   };
 
-  let platforms = [];
-  let coins = [];
-  let enemies = [];
+  let lives = 3;
+  let score = 0;
+  let gameOver = false;
 
-  function colCheck(shapeA, shapeB) {
-    const vX = (shapeA.x + shapeA.width / 2) - (shapeB.x + shapeB.width / 2);
-    const vY = (shapeA.y + shapeA.height / 2) - (shapeB.y + shapeB.height / 2);
-    const hWidths = (shapeA.width / 2) + (shapeB.width / 2);
-    const hHeights = (shapeA.height / 2) + (shapeB.height / 2);
-    let colDir = null;
+  // Plateformes simples
+  const platforms = [
+    {x: 0, y: 250, width: 480, height: 20},
+    {x: 100, y: 190, width: 100, height: 15},
+    {x: 250, y: 130, width: 120, height: 15},
+  ];
 
-    if (Math.abs(vX) < hWidths && Math.abs(vY) < hHeights) {
-      const oX = hWidths - Math.abs(vX);
-      const oY = hHeights - Math.abs(vY);
-      if (oX >= oY) {
-        if (vY > 0) {
-          colDir = "t";
-          shapeA.y += oY;
-        } else {
-          colDir = "b";
-          shapeA.y -= oY;
-        }
-      } else {
-        if (vX > 0) {
-          colDir = "l";
-          shapeA.x += oX;
-        } else {
-          colDir = "r";
-          shapeA.x -= oX;
-        }
-      }
-    }
-    return colDir;
+  // Pièces à collecter
+  const coins = [
+    {x: 120, y: 160, collected: false},
+    {x: 280, y: 100, collected: false},
+    {x: 400, y: 220, collected: false},
+  ];
+
+  // Ennemis simples qui patrouillent
+  const enemies = [
+    {x: 150, y: 230, width: 30, height: 20, dir: 1, speed: 2, color: '#0066ff'},
+    {x: 300, y: 110, width: 30, height: 20, dir: -1, speed: 2.5, color: '#0066ff'},
+  ];
+
+  const keys = { left: false, right: false, jump: false };
+
+  // Gestion clavier (desktop)
+  window.addEventListener('keydown', e => {
+    if (e.repeat) return;
+    if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+    if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+    if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') keys.jump = true;
+  });
+  window.addEventListener('keyup', e => {
+    if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+    if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+    if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') keys.jump = false;
+  });
+
+  // Gestion boutons tactiles mobile
+  leftBtn.addEventListener('touchstart', e => { e.preventDefault(); keys.left = true; });
+  leftBtn.addEventListener('touchend', e => { e.preventDefault(); keys.left = false; });
+  rightBtn.addEventListener('touchstart', e => { e.preventDefault(); keys.right = true; });
+  rightBtn.addEventListener('touchend', e => { e.preventDefault(); keys.right = false; });
+  jumpBtn.addEventListener('touchstart', e => { e.preventDefault(); keys.jump = true; });
+  jumpBtn.addEventListener('touchend', e => { e.preventDefault(); keys.jump = false; });
+
+  function rectsColliding(r1, r2) {
+    return !(r2.x > r1.x + r1.width || 
+             r2.x + r2.width < r1.x || 
+             r2.y > r1.y + r1.height ||
+             r2.y + r2.height < r1.y);
   }
 
-  function generateLevel(lvl) {
-    platforms = [
-      { x: 0, y: 410, width: 800, height: 40 },
-      { x: 200, y: 350, width: 100, height: 20 },
-      { x: 400, y: 300, width: 100, height: 20 },
-      { x: 600, y: 250, width: 100, height: 20 },
-    ];
-
-    coins = [
-      { x: 210, y: 320, collected: false },
-      { x: 410, y: 270, collected: false },
-      { x: 610, y: 220, collected: false },
-    ];
-
-    enemies = [
-      { x: 300, y: 370, width: 40, height: 40, color: "red", dir: 1, speed: 2 },
-    ];
-
-    if (lvl >= 2) {
-      platforms.push({ x: 100, y: 200, width: 100, height: 20 });
-      coins.push({ x: 110, y: 170, collected: false });
-      enemies.push({ x: 500, y: 270, width: 40, height: 40, color: "purple", dir: -1, speed: 2 });
-    }
-
-    if (lvl >= 3) {
-      platforms.push({ x: 700, y: 180, width: 80, height: 20 });
-      coins.push({ x: 710, y: 150, collected: false });
-      enemies.push({ x: 650, y: 220, width: 40, height: 40, color: "blue", dir: 1, speed: 3 });
-    }
-
-    if (lvl >= 4) {
-      platforms.push({ x: 500, y: 150, width: 120, height: 20 });
-      coins.push({ x: 510, y: 120, collected: false });
-      enemies.push({ x: 200, y: 310, width: 40, height: 40, color: "orange", dir: 1, speed: 4 });
-    }
-
-    if (lvl >= 5) {
-      platforms.push({ x: 350, y: 100, width: 150, height: 20 });
-      coins.push({ x: 360, y: 70, collected: false });
-      enemies.push({ x: 550, y: 210, width: 40, height: 40, color: "cyan", dir: -1, speed: 3 });
-    }
-
-    levelEl.textContent = lvl;
-  }
-
-  function nextLevel() {
-    level++;
-    generateLevel(level);
+  function resetPlayer() {
     player.x = 50;
-    player.y = 300;
+    player.y = 0;
+    player.velX = 0;
+    player.velY = 0;
+    player.jumping = false;
+    player.grounded = false;
+    player.doubleJump = false;
   }
 
-  function resetGame() {
-    score = 0;
-    lives = 3;
-    level = 1;
-    gameOver = false;
-    win = false;
-    player.x = 50;
-    player.y = 300;
-    scoreEl.textContent = score;
-    livesEl.textContent = lives;
-    levelEl.textContent = level;
-  }
+  function update() {
+    if (gameOver) return;
 
-  function startGame() {
-    resetGame();
-    menu.style.display = "none";
-    touchControls.style.display = "flex";
-    btnPause.style.display = "block";
-    bgMusic.play();
-    gameStarted = true;
-    generateLevel(level);
-    requestAnimationFrame(gameLoop);
-  }
-
-  function togglePause() {
-    paused = !paused;
-    if (paused) {
-      menuMessage.innerHTML = "Pause<br>Appuyez sur Reprendre";
-      startBtn.textContent = "Reprendre";
-      menu.style.display = "block";
-      bgMusic.pause();
+    // Mouvements horizontaux
+    if (keys.left) {
+      player.velX = Math.max(player.velX - 0.5, -player.speed);
+    } else if (keys.right) {
+      player.velX = Math.min(player.velX + 0.5, player.speed);
     } else {
-      menu.style.display = "none";
-      bgMusic.play();
-      requestAnimationFrame(gameLoop);
-    }
-  }
-
-  function gameLoop() {
-    if (!gameStarted || paused) return;
-
-    if (gameOver) {
-      menuMessage.innerHTML = `Game Over !<br>Score : ${score}<br>Meilleur : ${localStorage.getItem('bestScore') || 0}`;
-      menu.style.display = "block";
-      bgMusic.pause();
-      saveBestScore();
-      return;
-    }
-
-    if (win) {
-      menuMessage.innerHTML = `Bravo, tu as gagné !<br>Score : ${score}<br>Meilleur : ${localStorage.getItem('bestScore') || 0}`;
-      menu.style.display = "block";
-      bgMusic.pause();
-      saveBestScore();
-      return;
-    }
-
-    // Gestion input clavier + tactile
-    if ((keys["ArrowRight"] || keys["d"] || keys["btnRight"]) && player.velX < player.speed) player.velX++;
-    if ((keys["ArrowLeft"] || keys["a"] || keys["btnLeft"]) && player.velX > -player.speed) player.velX--;
-    if (!(keys["ArrowLeft"] || keys["a"] || keys["btnLeft"]) && !(keys["ArrowRight"] || keys["d"] || keys["btnRight"])) {
       player.velX *= friction;
+      if (Math.abs(player.velX) < 0.1) player.velX = 0;
     }
 
-    // Saut
-    if ((keys["ArrowUp"] || keys["w"] || keys["z"] || keys["btnJump"]) && !player.jumping) {
-      player.jumping = true;
-      player.grounded = false;
-      player.velY = -15;
-      jumpSound.currentTime = 0;
-      jumpSound.play();
-    } else if ((keys["ArrowUp"] || keys["w"] || keys["z"] || keys["btnJump"]) && player.jumping && !player.doubleJump) {
-      // double saut
-      player.velY = -13;
-      player.doubleJump = true;
-      jumpSound.currentTime = 0;
-      jumpSound.play();
+    // Saut + double saut
+    if (keys.jump) {
+      if (!player.jumping && player.grounded) {
+        player.velY = -15;
+        player.jumping = true;
+        player.grounded = false;
+      } else if (player.jumping && !player.doubleJump && !player.grounded) {
+        player.velY = -13;
+        player.doubleJump = true;
+      }
     }
 
     player.velY += gravity;
-
-    // Limiter vitesse horizontale
-    if (player.velX > player.speed) player.velX = player.speed;
-    if (player.velX < -player.speed) player.velX = -player.speed;
-
     player.x += player.velX;
     player.y += player.velY;
 
+    // Collision avec plateformes
     player.grounded = false;
-    player.doubleJump = false;
-
-    // Collisions plateformes
     for (let p of platforms) {
-      const dir = colCheck(player, p);
-      if (dir === "b") {
-        player.grounded = true;
-        player.jumping = false;
-        player.velY = 0;
-      } else if (dir === "l" || dir === "r") {
-        player.velX = 0;
-      }
-    }
-
-    if (player.grounded) {
-      player.velX *= friction;
-    }
-
-    // Collecte pièces
-    for (let c of coins) {
-      if (!c.collected) {
-        if (
-          player.x < c.x + 20 &&
-          player.x + player.width > c.x &&
-          player.y < c.y + 20 &&
-          player.y + player.height > c.y
-        ) {
-          c.collected = true;
-          score += 10;
-          coinSound.currentTime = 0;
-          coinSound.play();
-          scoreEl.textContent = score;
+      // Simple AABB collision from top only
+      if (player.x + player.width > p.x && player.x < p.x + p.width) {
+        if (player.y + player.height > p.y && player.y + player.height < p.y + p.height) {
+          player.y = p.y - player.height;
+          player.velY = 0;
+          player.grounded = true;
+          player.jumping = false;
+          player.doubleJump = false;
         }
       }
-    }
-
-    // Déplacement ennemis
-    for (let e of enemies) {
-      e.x += e.dir * e.speed;
-      // Changer direction si collision avec bord plateforme
-      let onPlatform = false;
-      for (let p of platforms) {
-        if (
-          e.x + e.width > p.x &&
-          e.x < p.x + p.width &&
-          e.y + e.height === p.y
-        ) {
-          onPlatform = true;
-          if (e.x <= p.x || e.x + e.width >= p.x + p.width) e.dir *= -1;
-        }
-      }
-      if (!onPlatform) e.dir *= -1;
-
-      // Collision joueur-ennemis
-      if (
-        player.x < e.x + e.width &&
-        player.x + player.width > e.x &&
-        player.y < e.y + e.height &&
-        player.y + player.height > e.y
-      ) {
-        lives--;
-        hitSound.currentTime = 0;
-        hitSound.play();
-        livesEl.textContent = lives;
-        if (lives <= 0) gameOver = true;
-        player.x = 50;
-        player.y = 300;
-      }
-    }
-
-    // Vérif tous pièces collectées ?
-    if (coins.every(c => c.collected)) {
-      nextLevel();
     }
 
     // Limites du canvas
@@ -455,129 +211,99 @@
     if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
     if (player.y > canvas.height) {
       lives--;
-      hitSound.currentTime = 0;
-      hitSound.play();
-      livesEl.textContent = lives;
-      if (lives <= 0) gameOver = true;
-      player.x = 50;
-      player.y = 300;
-      player.velY = 0;
+      if (lives <= 0) {
+        gameOver = true;
+        alert('Game Over ! Score final: ' + score);
+        document.location.reload();
+      } else {
+        resetPlayer();
+      }
+      livesDisplay.textContent = lives;
     }
 
-    // Effacer et dessiner
+    // Collecte pièces
+    coins.forEach(c => {
+      if (!c.collected) {
+        const coinRect = {x: c.x, y: c.y, width: 20, height: 20};
+        const playerRect = {x: player.x, y: player.y, width: player.width, height: player.height};
+        if (rectsColliding(coinRect, playerRect)) {
+          c.collected = true;
+          score += 10;
+          scoreDisplay.textContent = score;
+        }
+      }
+    });
+
+    // Déplacement ennemis
+    enemies.forEach(e => {
+      e.x += e.speed * e.dir;
+      // Rebondir sur plateformes
+      let onPlatform = false;
+      for (let p of platforms) {
+        if (e.x + e.width > p.x && e.x < p.x + p.width &&
+            e.y + e.height === p.y) {
+          onPlatform = true;
+          if (e.x <= p.x) e.dir = 1;
+          if (e.x + e.width >= p.x + p.width) e.dir = -1;
+        }
+      }
+      if (!onPlatform) e.dir *= -1;
+
+      // Collision avec joueur
+      const enemyRect = {x: e.x, y: e.y, width: e.width, height: e.height};
+      const playerRect = {x: player.x, y: player.y, width: player.width, height: player.height};
+      if (rectsColliding(enemyRect, playerRect)) {
+        lives--;
+        livesDisplay.textContent = lives;
+        if (lives <= 0) {
+          gameOver = true;
+          alert('Game Over ! Score final: ' + score);
+          document.location.reload();
+        } else {
+          resetPlayer();
+        }
+      }
+    });
+
+    draw();
+    requestAnimationFrame(update);
+  }
+
+  function draw() {
+    // Nettoyer
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Dessiner plateformes
-    ctx.fillStyle = "#654321";
-    for (let p of platforms) {
-      ctx.fillRect(p.x, p.y, p.width, p.height);
-    }
+    ctx.fillStyle = '#654321';
+    platforms.forEach(p => ctx.fillRect(p.x, p.y, p.width, p.height));
 
     // Dessiner pièces
-    for (let c of coins) {
+    coins.forEach(c => {
       if (!c.collected) {
-        ctx.fillStyle = "yellow";
+        ctx.fillStyle = 'yellow';
         ctx.beginPath();
         ctx.arc(c.x + 10, c.y + 10, 10, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = "orange";
+        ctx.strokeStyle = 'orange';
         ctx.lineWidth = 2;
         ctx.stroke();
       }
-    }
+    });
 
     // Dessiner ennemis
-    for (let e of enemies) {
+    enemies.forEach(e => {
       ctx.fillStyle = e.color;
       ctx.fillRect(e.x, e.y, e.width, e.height);
-    }
+    });
 
     // Dessiner joueur
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x, player.y, player.width, player.height);
-
-    requestAnimationFrame(gameLoop);
   }
 
-  // Gestion clavier
-  window.addEventListener("keydown", (e) => {
-    if (e.repeat) return;
-    keys[e.key.toLowerCase()] = true;
-    // Pour les touches tactiles simulées
-    if (e.key === "ArrowLeft") keys["btnLeft"] = true;
-    if (e.key === "ArrowRight") keys["btnRight"] = true;
-    if (e.key === "ArrowUp") keys["btnJump"] = true;
-  });
-
-  window.addEventListener("keyup", (e) => {
-    keys[e.key.toLowerCase()] = false;
-    if (e.key === "ArrowLeft") keys["btnLeft"] = false;
-    if (e.key === "ArrowRight") keys["btnRight"] = false;
-    if (e.key === "ArrowUp") keys["btnJump"] = false;
-  });
-
-  // Gestion boutons tactiles
-  btnLeft.addEventListener("touchstart", e => {
-    e.preventDefault();
-    keys["btnLeft"] = true;
-  });
-  btnLeft.addEventListener("touchend", e => {
-    e.preventDefault();
-    keys["btnLeft"] = false;
-  });
-  btnRight.addEventListener("touchstart", e => {
-    e.preventDefault();
-    keys["btnRight"] = true;
-  });
-  btnRight.addEventListener("touchend", e => {
-    e.preventDefault();
-    keys["btnRight"] = false;
-  });
-  btnJump.addEventListener("touchstart", e => {
-    e.preventDefault();
-    keys["btnJump"] = true;
-  });
-  btnJump.addEventListener("touchend", e => {
-    e.preventDefault();
-    keys["btnJump"] = false;
-  });
-
-  btnPause.addEventListener("click", () => {
-    togglePause();
-  });
-
-  // Adapt canvas taille écran (responsive)
-  function resizeCanvas() {
-    const ratio = 16/9;
-    let w = window.innerWidth;
-    let h = window.innerHeight;
-    if (w/h > ratio) {
-      w = h * ratio;
-    } else {
-      h = w / ratio;
-    }
-    canvas.style.width = w + "px";
-    canvas.style.height = h + "px";
-  }
-  window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
-
-  startBtn.addEventListener("click", () => {
-    if (!gameStarted) {
-      startGame();
-    } else {
-      location.reload();
-    }
-  });
-
-  // Instructions clavier dans menu
-  menuMessage.innerHTML +=
-    "<br><small>Déplacements : flèches / ZQSD ou boutons tactiles<br>Saut : flèche haut / Z / W (double saut ok)<br>Collecte toutes les pièces pour passer niveau</small>";
-
-  function saveBestScore() {
-    const best = localStorage.getItem('bestScore') || 0;
-    if (score > best) localStorage.setItem('bestScore', score);
-  }
+  // Start
+  resetPlayer();
+  update();
 })();
 </script>
 
